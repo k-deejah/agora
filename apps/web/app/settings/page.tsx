@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
-type SettingsTab = "profile" | "notifications" | "payment";
+type SettingsTab = "profile" | "notifications" | "payment" | "subscriptions";
 
 interface ProfileData {
   displayName: string;
@@ -22,6 +22,7 @@ const tabs: { id: SettingsTab; label: string }[] = [
   { id: "profile", label: "Profile" },
   { id: "notifications", label: "Notifications" },
   { id: "payment", label: "Payment" },
+  { id: "subscriptions", label: "Subscriptions" },
 ];
 
 export default function SettingsPage() {
@@ -215,7 +216,13 @@ export default function SettingsPage() {
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  if (tab.id === "subscriptions") {
+                    router.push("/settings/subscriptions");
+                  } else {
+                    setActiveTab(tab.id);
+                  }
+                }}
                 className={`flex-1 px-6 py-4 text-sm font-semibold transition-colors ${
                   activeTab === tab.id
                     ? "text-ink-soft border-b-2 border-ink"
