@@ -40,7 +40,9 @@ mod common;
 use agora_server::models::blockchain_checkpoint::CheckpointStore;
 use agora_server::models::indexer_event::IndexedEvent;
 use agora_server::services::indexer::{apply_event_state, buffer_insert, IndexerConfig};
-use common::{cleanup_organizer, random_synthetic_ledger_base, seed_organizer_and_event, test_pool};
+use common::{
+    cleanup_organizer, random_synthetic_ledger_base, seed_organizer_and_event, test_pool,
+};
 use serde_json::json;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -91,7 +93,10 @@ async fn emit_purchase(
     );
 
     let inserted = buffer_insert(pool, &event).await.expect("buffer_insert");
-    assert!(inserted > 0, "buffer_insert must not report a duplicate for a fresh id");
+    assert!(
+        inserted > 0,
+        "buffer_insert must not report a duplicate for a fresh id"
+    );
 
     if apply {
         apply_event_state(pool, config, None, &event)
@@ -136,7 +141,9 @@ async fn buffered_ledgers_at_or_above(pool: &PgPool, contract_id: &str, ledger: 
 /// buffered row at or after the fork must be purged.
 #[tokio::test]
 async fn five_ledger_reorg_within_unconfirmed_window_recovers_cleanly() {
-    let Some(pool) = test_pool("five_ledger_reorg_within_unconfirmed_window_recovers_cleanly").await else {
+    let Some(pool) =
+        test_pool("five_ledger_reorg_within_unconfirmed_window_recovers_cleanly").await
+    else {
         return;
     };
 
@@ -144,8 +151,7 @@ async fn five_ledger_reorg_within_unconfirmed_window_recovers_cleanly() {
     let config = test_indexer_config(&contract_id);
     let chain_key = format!("chaos-test:reorg:{}", Uuid::new_v4());
     let base = random_synthetic_ledger_base();
-    let (organizer_id, event_id) =
-        seed_organizer_and_event(&pool, "five-ledger-safe-reorg").await;
+    let (organizer_id, event_id) = seed_organizer_and_event(&pool, "five-ledger-safe-reorg").await;
 
     // Ledgers [base, base+4]: finalized and applied — these must survive.
     for i in 0..5u32 {
